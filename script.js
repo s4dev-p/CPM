@@ -65,22 +65,141 @@ document.addEventListener('DOMContentLoaded', function() {
         observer.observe(el);
     });
 
-    // Header scroll effect (simplificado)
+    // Header scroll animation - Logo vai para o centro e botão fica ao lado
     const header = document.querySelector('.header');
+    const headerContainer = document.querySelector('.header-container');
+    const logo = document.querySelector('.logo');
+    const nav = document.querySelector('.nav');
     let lastScroll = 0;
+    let isScrolled = false;
 
     window.addEventListener('scroll', () => {
         const currentScroll = window.pageYOffset;
         
-        if (currentScroll > 100) {
-            header.style.background = 'rgba(255, 255, 255, 0.98)';
-            header.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
-        } else {
-            header.style.background = 'rgba(255, 255, 255, 0.95)';
-            header.style.boxShadow = 'none';
+        // Adiciona classe scrolled quando scroll > 100px
+        if (currentScroll > 100 && !isScrolled) {
+            header.classList.add('scrolled');
+            isScrolled = true;
+        } else if (currentScroll <= 100 && isScrolled) {
+            header.classList.remove('scrolled');
+            isScrolled = false;
         }
         
         lastScroll = currentScroll;
     }, { passive: true });
+
+    // Animação de entrada dos elementos quando a página carrega
+    const animateOnLoad = () => {
+        const heroElements = document.querySelectorAll('.hero-badge, .hero-title, .hero-description, .hero-stats, .hero-buttons');
+        
+        heroElements.forEach((el, index) => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+            
+            setTimeout(() => {
+                el.style.opacity = '1';
+                el.style.transform = 'translateY(0)';
+            }, index * 200);
+        });
+
+        // Animação dos cards flutuantes
+        const floatingCards = document.querySelectorAll('.floating-card');
+        floatingCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(50px) scale(0.8)';
+            card.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+            
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0) scale(1)';
+            }, 1000 + (index * 200));
+        });
+    };
+
+    // Executar animação de entrada
+    animateOnLoad();
+
+    // Parallax effect para o hero
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        const hero = document.querySelector('.hero');
+        const heroContent = document.querySelector('.hero-content');
+        const heroVisual = document.querySelector('.hero-visual');
+        
+        if (hero && scrolled < hero.offsetHeight) {
+            const rate = scrolled * -0.5;
+            if (heroContent) {
+                heroContent.style.transform = `translateY(${rate * 0.3}px)`;
+            }
+            if (heroVisual) {
+                heroVisual.style.transform = `translateY(${rate * 0.1}px)`;
+            }
+        }
+    }, { passive: true });
+
+    // Animação dos números das estatísticas
+    const animateStats = () => {
+        const statNumbers = document.querySelectorAll('.stat-number');
+        
+        statNumbers.forEach(stat => {
+            const target = stat.textContent;
+            const finalNumber = target.includes('+') ? target.replace('+', '') : target;
+            
+            if (finalNumber !== '--') {
+                let current = 0;
+                const increment = parseInt(finalNumber) / 50;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= parseInt(finalNumber)) {
+                        current = parseInt(finalNumber);
+                        clearInterval(timer);
+                    }
+                    stat.textContent = Math.floor(current) + (target.includes('+') ? '+' : '');
+                }, 30);
+            }
+        });
+    };
+
+    // Observar seção de estatísticas para animar
+    const statsObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                animateStats();
+                statsObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.5 });
+
+    const statsSection = document.querySelector('.hero-stats');
+    if (statsSection) {
+        statsObserver.observe(statsSection);
+    }
+
+    // Efeito de hover nos cards de features
+    document.querySelectorAll('.feature-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px) scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+
+    // Smooth reveal para elementos quando entram na viewport
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('revealed');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    // Adicionar classe para elementos que devem ser revelados
+    document.querySelectorAll('.feature-card, .section-title').forEach(el => {
+        el.classList.add('reveal-on-scroll');
+        revealObserver.observe(el);
+    });
 });
 
