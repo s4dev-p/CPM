@@ -60,20 +60,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // Observar elementos para animação
     document.querySelectorAll('.feature-card, .floating-card').forEach(el => {
         el.style.opacity = '0';
-        el.style.transform = 'translateY(20px)';
-        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'opacity 0.8s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1)';
         observer.observe(el);
     });
 
-    // Header scroll animation - Logo vai para o centro e botão fica ao lado
+    // Advanced Header scroll effect with smooth animation - Logo vai para o centro e botão fica ao lado
     const header = document.querySelector('.header');
     const headerContainer = document.querySelector('.header-container');
     const logo = document.querySelector('.logo');
     const nav = document.querySelector('.nav');
-    let lastScroll = 0;
     let isScrolled = false;
+    let ticking = false;
 
-    window.addEventListener('scroll', () => {
+    function updateHeader() {
         const currentScroll = window.pageYOffset;
         
         // Adiciona classe scrolled quando scroll > 100px
@@ -85,121 +85,54 @@ document.addEventListener('DOMContentLoaded', function() {
             isScrolled = false;
         }
         
-        lastScroll = currentScroll;
-    }, { passive: true });
-
-    // Animação de entrada dos elementos quando a página carrega
-    const animateOnLoad = () => {
-        const heroElements = document.querySelectorAll('.hero-badge, .hero-title, .hero-description, .hero-stats, .hero-buttons');
-        
-        heroElements.forEach((el, index) => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(30px)';
-            el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-            
-            setTimeout(() => {
-                el.style.opacity = '1';
-                el.style.transform = 'translateY(0)';
-            }, index * 200);
-        });
-
-        // Animação dos cards flutuantes
-        const floatingCards = document.querySelectorAll('.floating-card');
-        floatingCards.forEach((card, index) => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(50px) scale(0.8)';
-            card.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-            
-            setTimeout(() => {
-                card.style.opacity = '1';
-                card.style.transform = 'translateY(0) scale(1)';
-            }, 1000 + (index * 200));
-        });
-    };
-
-    // Executar animação de entrada
-    animateOnLoad();
-
-    // Parallax effect para o hero
-    window.addEventListener('scroll', () => {
-        const scrolled = window.pageYOffset;
-        const hero = document.querySelector('.hero');
-        const heroContent = document.querySelector('.hero-content');
-        const heroVisual = document.querySelector('.hero-visual');
-        
-        if (hero && scrolled < hero.offsetHeight) {
-            const rate = scrolled * -0.5;
-            if (heroContent) {
-                heroContent.style.transform = `translateY(${rate * 0.3}px)`;
-            }
-            if (heroVisual) {
-                heroVisual.style.transform = `translateY(${rate * 0.1}px)`;
-            }
-        }
-    }, { passive: true });
-
-    // Animação dos números das estatísticas
-    const animateStats = () => {
-        const statNumbers = document.querySelectorAll('.stat-number');
-        
-        statNumbers.forEach(stat => {
-            const target = stat.textContent;
-            const finalNumber = target.includes('+') ? target.replace('+', '') : target;
-            
-            if (finalNumber !== '--') {
-                let current = 0;
-                const increment = parseInt(finalNumber) / 50;
-                const timer = setInterval(() => {
-                    current += increment;
-                    if (current >= parseInt(finalNumber)) {
-                        current = parseInt(finalNumber);
-                        clearInterval(timer);
-                    }
-                    stat.textContent = Math.floor(current) + (target.includes('+') ? '+' : '');
-                }, 30);
-            }
-        });
-    };
-
-    // Observar seção de estatísticas para animar
-    const statsObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                animateStats();
-                statsObserver.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.5 });
-
-    const statsSection = document.querySelector('.hero-stats');
-    if (statsSection) {
-        statsObserver.observe(statsSection);
+        ticking = false;
     }
 
-    // Efeito de hover nos cards de features
-    document.querySelectorAll('.feature-card').forEach(card => {
-        card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-8px) scale(1.02)';
-        });
+    function requestTick() {
+        if (!ticking) {
+            requestAnimationFrame(updateHeader);
+            ticking = true;
+        }
+    }
+
+    window.addEventListener('scroll', requestTick, { passive: true });
+
+    // Add smooth loading animation for hero elements
+    const heroElements = document.querySelectorAll('.hero-title, .hero-description, .hero-badge, .hero-stats, .hero-buttons');
+    heroElements.forEach((el, index) => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = `opacity 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) ${index * 0.1}s, transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) ${index * 0.1}s`;
         
-        card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0) scale(1)';
-        });
+        setTimeout(() => {
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+        }, 100);
     });
 
-    // Smooth reveal para elementos quando entram na viewport
-    const revealObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('revealed');
-            }
-        });
-    }, { threshold: 0.1 });
-
-    // Adicionar classe para elementos que devem ser revelados
-    document.querySelectorAll('.feature-card, .section-title').forEach(el => {
-        el.classList.add('reveal-on-scroll');
-        revealObserver.observe(el);
+    // Add loading animation for floating cards
+    const floatingCards = document.querySelectorAll('.floating-card');
+    floatingCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(50px) scale(0.8)';
+        card.style.transition = `opacity 1s cubic-bezier(0.25, 0.8, 0.25, 1) ${0.5 + index * 0.2}s, transform 1s cubic-bezier(0.25, 0.8, 0.25, 1) ${0.5 + index * 0.2}s`;
+        
+        setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0) scale(1)';
+        }, 100);
     });
+
+    // Smooth parallax effect for floating cards
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        const parallaxElements = document.querySelectorAll('.floating-card');
+        
+        parallaxElements.forEach((el, index) => {
+            const speed = 0.5 + (index * 0.1);
+            const yPos = -(scrolled * speed);
+            el.style.transform = `translateY(${yPos}px)`;
+        });
+    }, { passive: true });
 });
 
