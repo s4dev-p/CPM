@@ -60,27 +60,75 @@ document.addEventListener('DOMContentLoaded', function() {
     // Observar elementos para animação
     document.querySelectorAll('.feature-card, .floating-card').forEach(el => {
         el.style.opacity = '0';
-        el.style.transform = 'translateY(20px)';
-        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'opacity 0.8s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1)';
         observer.observe(el);
     });
 
-    // Header scroll effect (simplificado)
+    // Advanced Header scroll effect with smooth animation
     const header = document.querySelector('.header');
-    let lastScroll = 0;
+    let isScrolled = false;
+    let ticking = false;
 
-    window.addEventListener('scroll', () => {
+    function updateHeader() {
         const currentScroll = window.pageYOffset;
         
-        if (currentScroll > 100) {
-            header.style.background = 'rgba(255, 255, 255, 0.98)';
-            header.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
-        } else {
-            header.style.background = 'rgba(255, 255, 255, 0.95)';
-            header.style.boxShadow = 'none';
+        if (currentScroll > 100 && !isScrolled) {
+            header.classList.add('scrolled');
+            isScrolled = true;
+        } else if (currentScroll <= 100 && isScrolled) {
+            header.classList.remove('scrolled');
+            isScrolled = false;
         }
         
-        lastScroll = currentScroll;
+        ticking = false;
+    }
+
+    function requestTick() {
+        if (!ticking) {
+            requestAnimationFrame(updateHeader);
+            ticking = true;
+        }
+    }
+
+    window.addEventListener('scroll', requestTick, { passive: true });
+
+    // Add smooth loading animation for hero elements
+    const heroElements = document.querySelectorAll('.hero-title, .hero-description, .hero-badge, .hero-stats, .hero-buttons');
+    heroElements.forEach((el, index) => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = `opacity 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) ${index * 0.1}s, transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) ${index * 0.1}s`;
+        
+        setTimeout(() => {
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+        }, 100);
+    });
+
+    // Add loading animation for floating cards
+    const floatingCards = document.querySelectorAll('.floating-card');
+    floatingCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(50px) scale(0.8)';
+        card.style.transition = `opacity 1s cubic-bezier(0.25, 0.8, 0.25, 1) ${0.5 + index * 0.2}s, transform 1s cubic-bezier(0.25, 0.8, 0.25, 1) ${0.5 + index * 0.2}s`;
+        
+        setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0) scale(1)';
+        }, 100);
+    });
+
+    // Smooth parallax effect for floating cards
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        const parallaxElements = document.querySelectorAll('.floating-card');
+        
+        parallaxElements.forEach((el, index) => {
+            const speed = 0.5 + (index * 0.1);
+            const yPos = -(scrolled * speed);
+            el.style.transform = `translateY(${yPos}px)`;
+        });
     }, { passive: true });
 });
 
