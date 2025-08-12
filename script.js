@@ -65,14 +65,18 @@ document.addEventListener('DOMContentLoaded', function() {
         observer.observe(el);
     });
 
-    // Advanced Header scroll effect with smooth animation
+    // Advanced Header scroll effect with smooth animation - Logo vai para o centro e botão fica ao lado
     const header = document.querySelector('.header');
+    const headerContainer = document.querySelector('.header-container');
+    const logo = document.querySelector('.logo');
+    const nav = document.querySelector('.nav');
     let isScrolled = false;
     let ticking = false;
 
     function updateHeader() {
         const currentScroll = window.pageYOffset;
         
+        // Adiciona classe scrolled quando scroll > 100px
         if (currentScroll > 100 && !isScrolled) {
             header.classList.add('scrolled');
             isScrolled = true;

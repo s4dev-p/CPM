@@ -154,6 +154,8 @@ body {
     gap: 0.5rem;
     box-shadow: var(--shadow);
     border: 1px solid transparent;
+    position: relative;
+    overflow: hidden;
 }
 
 .inscription-btn:hover {
@@ -208,6 +210,8 @@ body {
     font-weight: 500;
     margin-bottom: 2rem;
     border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
 }
 
 .hero-title {
@@ -383,6 +387,7 @@ body {
 .features {
     padding: 8rem 0;
     background: var(--bg-secondary);
+    position: relative;
 }
 
 .section-title {
@@ -392,6 +397,7 @@ body {
     margin-bottom: 4rem;
     color: var(--text-primary);
     letter-spacing: -0.02em;
+    position: relative;
 }
 
 .features-grid {
@@ -438,6 +444,7 @@ body {
     background: var(--primary);
     color: white;
     padding: 6rem 0 2rem;
+    position: relative;
 }
 
 .footer-container {
@@ -459,6 +466,7 @@ body {
     margin-bottom: 1.5rem;
     color: white;
     letter-spacing: -0.01em;
+    position: relative;
 }
 
 .footer-logo {
